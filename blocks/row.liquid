@@ -1,0 +1,709 @@
+{% doc %}
+  Widget: Row
+
+  The main layout container. Accepts any theme block, typically
+  Columns. The outer element carries the background and spacing.
+  The inner element is the flex or grid container that lays out
+  the child blocks.
+{% enddoc %}
+
+{%- liquid
+  assign settings = block.settings
+  assign tag = settings.html_tag | default: 'div'
+
+  # Modifier classes for layout behavior
+  assign row_classes = ''
+  if settings.layout == 'grid'
+    assign row_classes = row_classes | append: ' wst-row--grid'
+  endif
+  if settings.stack_on_mobile
+    assign row_classes = row_classes | append: ' wst-row--stack'
+  endif
+
+  # Inner container, boxed or full width
+  assign inner_class = 'wst-row__inner'
+  if settings.content_width == 'boxed'
+    assign inner_class = inner_class | append: ' wst-row__inner--boxed'
+  endif
+
+  # Widget specific style variables, passed to wst-attributes
+  capture row_vars
+    if settings.layout == 'grid'
+      echo '--wst-cols: ' | append: settings.grid_columns | append: ';'
+      echo '--wst-cols-m: ' | append: settings.grid_columns_mobile | append: ';'
+    else
+      echo '--wst-direction: ' | append: settings.direction | append: ';'
+      if settings.wrap
+        echo '--wst-flex-wrap: wrap;'
+      endif
+    endif
+    echo '--wst-justify: ' | append: settings.justify | append: ';'
+    echo '--wst-align-items: ' | append: settings.align_items | append: ';'
+    if settings.gap_row > 0
+      echo '--wst-gap-row: ' | append: settings.gap_row | append: 'px;'
+    endif
+    if settings.gap_column > 0
+      echo '--wst-gap-col: ' | append: settings.gap_column | append: 'px;'
+    endif
+    if settings.content_width == 'boxed'
+      echo '--wst-content-width: ' | append: settings.content_max_width | append: 'px;'
+    endif
+    if settings.min_height_type == 'custom'
+      echo '--wst-min-h: ' | append: settings.min_height | append: 'px;'
+    elsif settings.min_height_type == 'screen'
+      echo '--wst-min-h: 100svh;'
+    endif
+  endcapture
+-%}
+
+<{{ tag }} {% render 'wst-attributes', block: block, widget: 'row', extra_class: row_classes, extra_vars: row_vars %}>
+  <div class="{{ inner_class }}">
+    {% content_for 'blocks' %}
+  </div>
+</{{ tag }}>
+
+{% stylesheet %}
+  .wst-row__inner {
+    display: flex;
+    flex-direction: var(--wst-direction, row);
+    justify-content: var(--wst-justify, flex-start);
+    align-items: var(--wst-align-items, stretch);
+    flex-wrap: var(--wst-flex-wrap, nowrap);
+    row-gap: var(--wst-gap-row, 0);
+    column-gap: var(--wst-gap-col, 0);
+    min-height: inherit;
+  }
+
+  .wst-row__inner--boxed {
+    width: 100%;
+    max-width: var(--wst-content-width, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .wst-row--grid .wst-row__inner {
+    display: grid;
+    grid-template-columns: repeat(var(--wst-cols, 2), minmax(0, 1fr));
+  }
+
+  @media screen and (max-width: 749.98px) {
+    .wst-row--stack .wst-row__inner {
+      flex-direction: column;
+    }
+
+    .wst-row--stack .wst-column,
+    .wst-row--stack .wst-column--fixed {
+      flex-basis: auto;
+      width: 100%;
+    }
+
+    .wst-row--grid .wst-row__inner {
+      grid-template-columns: repeat(var(--wst-cols-m, 1), minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Row",
+  "blocks": [
+    {
+      "type": "@theme"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "flex",
+          "label": "Flexible"
+        },
+        {
+          "value": "grid",
+          "label": "Grid"
+        }
+      ],
+      "default": "flex"
+    },
+    {
+      "type": "select",
+      "id": "html_tag",
+      "label": "HTML tag",
+      "options": [
+        {
+          "value": "div",
+          "label": "Div"
+        },
+        {
+          "value": "section",
+          "label": "Section"
+        },
+        {
+          "value": "header",
+          "label": "Header"
+        },
+        {
+          "value": "footer",
+          "label": "Footer"
+        },
+        {
+          "value": "aside",
+          "label": "Aside"
+        }
+      ],
+      "default": "div"
+    },
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full width"
+        },
+        {
+          "value": "boxed",
+          "label": "Boxed"
+        }
+      ],
+      "default": "boxed"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Boxed maximum width",
+      "min": 600,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1200,
+      "visible_if": "{{ block.settings.content_width == 'boxed' }}"
+    },
+    {
+      "type": "select",
+      "id": "min_height_type",
+      "label": "Minimum height",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        },
+        {
+          "value": "screen",
+          "label": "Fit to screen"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Custom minimum height",
+      "min": 100,
+      "max": 1000,
+      "step": 20,
+      "unit": "px",
+      "default": 400,
+      "visible_if": "{{ block.settings.min_height_type == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        {
+          "value": "row",
+          "label": "Horizontal"
+        },
+        {
+          "value": "row-reverse",
+          "label": "Horizontal reversed"
+        },
+        {
+          "value": "column",
+          "label": "Vertical"
+        },
+        {
+          "value": "column-reverse",
+          "label": "Vertical reversed"
+        }
+      ],
+      "default": "row",
+      "info": "Applies to flexible layout.",
+      "visible_if": "{{ block.settings.layout == 'flex' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "wrap",
+      "label": "Allow items to wrap",
+      "default": false,
+      "info": "Applies to flexible layout.",
+      "visible_if": "{{ block.settings.layout == 'flex' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "stack_on_mobile",
+      "label": "Stack items on mobile",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "grid_columns",
+      "label": "Grid columns",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 2,
+      "info": "Applies to grid layout.",
+      "visible_if": "{{ block.settings.layout == 'grid' }}"
+    },
+    {
+      "type": "range",
+      "id": "grid_columns_mobile",
+      "label": "Grid columns (mobile)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1,
+      "info": "Applies to grid layout.",
+      "visible_if": "{{ block.settings.layout == 'grid' }}"
+    },
+    {
+      "type": "select",
+      "id": "justify",
+      "label": "Justify content",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Start"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "End"
+        },
+        {
+          "value": "space-between",
+          "label": "Space between"
+        },
+        {
+          "value": "space-around",
+          "label": "Space around"
+        },
+        {
+          "value": "space-evenly",
+          "label": "Space evenly"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "align_items",
+      "label": "Align items",
+      "options": [
+        {
+          "value": "stretch",
+          "label": "Stretch"
+        },
+        {
+          "value": "flex-start",
+          "label": "Start"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "End"
+        }
+      ],
+      "default": "stretch"
+    },
+    {
+      "type": "range",
+      "id": "gap_row",
+      "label": "Vertical gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "gap_column",
+      "label": "Horizontal gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "select",
+      "id": "background_position",
+      "label": "Background image position",
+      "options": [
+        {
+          "value": "top left",
+          "label": "Top left"
+        },
+        {
+          "value": "top center",
+          "label": "Top center"
+        },
+        {
+          "value": "top right",
+          "label": "Top right"
+        },
+        {
+          "value": "center left",
+          "label": "Center left"
+        },
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center right",
+          "label": "Center right"
+        },
+        {
+          "value": "bottom left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "bottom right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "center center",
+      "visible_if": "{{ block.settings.background_image != blank }}"
+    },
+    {
+      "type": "select",
+      "id": "background_size",
+      "label": "Background image size",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover"
+        },
+        {
+          "value": "contain",
+          "label": "Contain"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ block.settings.background_image != blank }}"
+    },
+    {
+      "type": "select",
+      "id": "background_repeat",
+      "label": "Background image repeat",
+      "options": [
+        {
+          "value": "no-repeat",
+          "label": "No repeat"
+        },
+        {
+          "value": "repeat",
+          "label": "Repeat"
+        }
+      ],
+      "default": "no-repeat",
+      "visible_if": "{{ block.settings.background_image != blank }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Background overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_mobile_spacing",
+      "label": "Use custom mobile spacing",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.custom_mobile_spacing }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.custom_mobile_spacing }}"
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "Border",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "solid",
+          "label": "Solid"
+        },
+        {
+          "value": "dashed",
+          "label": "Dashed"
+        },
+        {
+          "value": "dotted",
+          "label": "Dotted"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border thickness",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 1,
+      "visible_if": "{{ block.settings.border_style != 'none' }}"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#121212",
+      "visible_if": "{{ block.settings.border_style != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Entrance animation",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fade",
+          "label": "Fade in"
+        },
+        {
+          "value": "fade-up",
+          "label": "Fade up"
+        },
+        {
+          "value": "fade-down",
+          "label": "Fade down"
+        },
+        {
+          "value": "fade-left",
+          "label": "Fade left"
+        },
+        {
+          "value": "fade-right",
+          "label": "Fade right"
+        },
+        {
+          "value": "zoom-in",
+          "label": "Zoom in"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "animation_duration",
+      "label": "Animation speed",
+      "options": [
+        {
+          "value": "fast",
+          "label": "Fast"
+        },
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "slow",
+          "label": "Slow"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.animation != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "animation_delay",
+      "label": "Animation delay",
+      "min": 0,
+      "max": 1000,
+      "step": 100,
+      "unit": "ms",
+      "default": 0,
+      "visible_if": "{{ block.settings.animation != 'none' }}"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_tablet",
+      "label": "Hide on tablet",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "custom_class",
+      "label": "Custom CSS class",
+      "info": "Add your own class names, separated by spaces."
+    },
+    {
+      "type": "text",
+      "id": "custom_id",
+      "label": "Custom ID",
+      "info": "Optional anchor, for example to link to this element from a menu."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Row",
+      "blocks": [
+        {
+          "type": "column"
+        },
+        {
+          "type": "column"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

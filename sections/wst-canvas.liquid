@@ -1,0 +1,22 @@
+{%- comment -%}
+  Canvas
+  ------------------------------------------------------------------
+  A neutral host section that accepts every theme block. Used to
+  test widgets in the theme editor during development, and later as
+  the general-purpose "build anything" section of the theme.
+{%- endcomment -%}
+<div class="wst-canvas page-width">
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "Canvas",
+  "blocks": [{ "type": "@theme" }],
+  "presets": [
+    {
+      "name": "Canvas"
+    }
+  ]
+}
+{% endschema %}

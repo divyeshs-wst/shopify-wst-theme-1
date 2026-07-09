@@ -1,0 +1,155 @@
+/* ==========================================================================
+   WST widget engine
+   --------------------------------------------------------------------------
+   Shared behavior for every widget. Widgets pass their settings in as
+   CSS custom properties (see snippets/wst-style-vars.liquid); this file
+   turns those variables into actual styling. Widget specific rules live
+   in each block's own {% stylesheet %} tag.
+
+   Breakpoints, following the Shopify convention:
+     mobile     less than 750px
+     tablet     750px to 989px
+     desktop    990px and up
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Widget base
+   --------------------------------------------------------------------------
+   The variable reset below is important: CSS custom properties inherit
+   down the DOM, so without it a Row's padding or direction would leak
+   into every widget inside it. Setting a variable to `initial` makes it
+   invalid again on each widget, so the fallbacks in var() take over.
+   A widget's own style attribute always wins over this reset.
+
+   Every variable used by the engine or by any widget must be listed
+   here. When you add a new variable to a widget, add it to this list.
+   -------------------------------------------------------------------------- */
+.wst-widget {
+  --wst-bg: initial;
+  --wst-bg-img: initial;
+  --wst-bg-pos: initial;
+  --wst-bg-size: initial;
+  --wst-bg-repeat: initial;
+  --wst-pt: initial;
+  --wst-pb: initial;
+  --wst-pt-m: initial;
+  --wst-pb-m: initial;
+  --wst-mt: initial;
+  --wst-mb: initial;
+  --wst-border: initial;
+  --wst-radius: initial;
+  --wst-min-h: initial;
+  --wst-anim-delay: initial;
+  --wst-anim-duration: initial;
+  --wst-direction: initial;
+  --wst-justify: initial;
+  --wst-align-items: initial;
+  --wst-flex-wrap: initial;
+  --wst-gap-row: initial;
+  --wst-gap-col: initial;
+  --wst-cols: initial;
+  --wst-cols-m: initial;
+  --wst-col-w: initial;
+  --wst-content-width: initial;
+  --wst-align: initial;
+  --wst-color: initial;
+  --wst-text-size: initial;
+  --wst-text-lh: initial;
+  --wst-text-cols: initial;
+  --wst-text-col-gap: initial;
+
+  background-color: var(--wst-bg, transparent);
+  background-image: var(--wst-bg-img, none);
+  background-position: var(--wst-bg-pos, center);
+  background-size: var(--wst-bg-size, cover);
+  background-repeat: var(--wst-bg-repeat, no-repeat);
+  padding-top: var(--wst-pt, 0);
+  padding-bottom: var(--wst-pb, 0);
+  margin-top: var(--wst-mt, 0);
+  margin-bottom: var(--wst-mb, 0);
+  border: var(--wst-border, none);
+  border-radius: var(--wst-radius, 0);
+  min-height: var(--wst-min-h, auto);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive spacing and device visibility
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 749.98px) {
+  .wst-widget {
+    padding-top: var(--wst-pt-m, var(--wst-pt, 0));
+    padding-bottom: var(--wst-pb-m, var(--wst-pb, 0));
+  }
+
+  .wst-hide-mobile {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 750px) and (max-width: 989.98px) {
+  .wst-hide-tablet {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .wst-hide-desktop {
+    display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Animation engine
+   --------------------------------------------------------------------------
+   Widgets only output data-wst-animate and data-wst-duration attributes.
+   assets/wst-animate.js adds the .wst-inview class when the element
+   scrolls into view. Everything is wrapped in prefers-reduced-motion,
+   so visitors who prefer reduced motion always see static, visible
+   content.
+   -------------------------------------------------------------------------- */
+[data-wst-duration='fast'] {
+  --wst-anim-duration: 300ms;
+}
+
+[data-wst-duration='normal'] {
+  --wst-anim-duration: 600ms;
+}
+
+[data-wst-duration='slow'] {
+  --wst-anim-duration: 1000ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-wst-animate] {
+    opacity: 0;
+    transition:
+      opacity var(--wst-anim-duration, 600ms) ease,
+      transform var(--wst-anim-duration, 600ms) ease;
+    transition-delay: var(--wst-anim-delay, 0ms);
+  }
+
+  [data-wst-animate='fade-up'] {
+    transform: translateY(24px);
+  }
+
+  [data-wst-animate='fade-down'] {
+    transform: translateY(-24px);
+  }
+
+  [data-wst-animate='fade-left'] {
+    transform: translateX(24px);
+  }
+
+  [data-wst-animate='fade-right'] {
+    transform: translateX(-24px);
+  }
+
+  [data-wst-animate='zoom-in'] {
+    transform: scale(0.92);
+  }
+
+  [data-wst-animate].wst-inview {
+    opacity: 1;
+    transform: none;
+  }
+}

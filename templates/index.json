@@ -1,0 +1,82 @@
+{
+  "sections": {
+    "main": {
+      "type": "wst-canvas",
+      "blocks": {
+        "row_demo": {
+          "type": "row",
+          "settings": {
+            "layout": "flex",
+            "content_width": "boxed",
+            "padding_top": 64,
+            "padding_bottom": 64,
+            "gap_column": 40,
+            "background_color": "#f6f4ef"
+          },
+          "blocks": {
+            "col_left": {
+              "type": "column",
+              "settings": {
+                "justify": "center"
+              },
+              "blocks": {
+                "h_left": {
+                  "type": "heading",
+                  "settings": {
+                    "heading": "Row, Column, Heading",
+                    "heading_tag": "h1",
+                    "animation": "fade-up"
+                  }
+                },
+                "t_left": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>This text comes from Shopify's rich text editor. Switch the block to <strong>Code</strong> mode for raw HTML.</p>",
+                    "animation": "fade-up",
+                    "animation_delay": 100
+                  }
+                }
+              },
+              "block_order": [
+                "h_left",
+                "t_left"
+              ]
+            },
+            "col_right": {
+              "type": "column",
+              "settings": {
+                "justify": "center"
+              },
+              "blocks": {
+                "h_right": {
+                  "type": "heading",
+                  "settings": {
+                    "heading": "Nested and animated",
+                    "heading_tag": "h3",
+                    "alignment": "right",
+                    "animation": "fade-up",
+                    "animation_delay": 200
+                  }
+                }
+              },
+              "block_order": [
+                "h_right"
+              ]
+            }
+          },
+          "block_order": [
+            "col_left",
+            "col_right"
+          ]
+        }
+      },
+      "block_order": [
+        "row_demo"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

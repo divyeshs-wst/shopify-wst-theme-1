@@ -1,0 +1,47 @@
+{% doc %}
+  Renders the root element attributes shared by every widget:
+  classes, custom ID, style variables, animation data attributes,
+  and the theme editor attributes.
+
+  @param {object} block - The block object
+  @param {string} widget - Widget name, for example 'heading'
+  @param {string} [extra_class] - Additional classes for this widget
+  @param {string} [extra_vars] - Additional CSS variables, already
+                                 formatted as "--name: value;"
+
+  @example
+  <div {% render 'wst-attributes', block: block, widget: 'heading' %}>
+{% enddoc %}
+
+{%- liquid
+  assign settings = block.settings
+
+  # Build the class list
+  assign class_list = 'wst-widget wst-' | append: widget
+  if extra_class != blank
+    assign class_list = class_list | append: ' ' | append: extra_class
+  endif
+  if settings.hide_on_desktop
+    assign class_list = class_list | append: ' wst-hide-desktop'
+  endif
+  if settings.hide_on_tablet
+    assign class_list = class_list | append: ' wst-hide-tablet'
+  endif
+  if settings.hide_on_mobile
+    assign class_list = class_list | append: ' wst-hide-mobile'
+  endif
+  if settings.custom_class != blank
+    assign class_list = class_list | append: ' ' | append: settings.custom_class
+  endif
+
+  # Collect the shared style variables plus any widget specific ones
+  capture style_vars
+    render 'wst-style-vars', settings: settings
+    echo extra_vars
+  endcapture
+  assign style_vars = style_vars | strip
+-%}
+class="{{ class_list | strip | escape }}"
+{%- if settings.custom_id != blank %} id="{{ settings.custom_id | escape }}"{% endif -%}
+{%- if style_vars != blank %} style="{{ style_vars }}"{% endif -%}
+{%- if settings.animation != blank and settings.animation != 'none' %} data-wst-animate="{{ settings.animation }}" data-wst-duration="{{ settings.animation_duration | default: 'normal' }}"{% endif %} {{ block.shopify_attributes }}

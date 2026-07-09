@@ -1,0 +1,76 @@
+{% doc %}
+  Converts a widget's shared settings into CSS custom properties.
+
+  This snippet only outputs variables like "--wst-pt: 24px;".
+  It never outputs CSS rules. The stylesheet assets/wst-engine.css
+  reads these variables and applies the actual styling.
+
+  Settings that are empty or still at their default value are
+  skipped, so the stylesheet fallbacks stay in control.
+
+  @param {object} settings - The block settings
+
+  @example
+  {% render 'wst-style-vars', settings: block.settings %}
+{% enddoc %}
+
+{%- liquid
+  # Background color
+  if settings.background_color != blank and settings.background_color.alpha != 0.0
+    echo '--wst-bg: ' | append: settings.background_color | append: ';'
+  endif
+
+  # Background overlay color, combined with its opacity setting
+  assign overlay = blank
+  if settings.overlay_opacity > 0 and settings.overlay_color != blank
+    assign overlay_alpha = settings.overlay_opacity | divided_by: 100.0
+    assign overlay = settings.overlay_color | color_modify: 'alpha', overlay_alpha
+  endif
+
+  # Background image. The overlay is layered on top of the image as a
+  # flat gradient, so no extra markup or pseudo-elements are needed.
+  if settings.background_image != blank
+    assign image_url = settings.background_image | image_url: width: 1920
+    if overlay != blank
+      echo '--wst-bg-img: linear-gradient(' | append: overlay | append: ', ' | append: overlay | append: "), url('" | append: image_url | append: "');"
+    else
+      echo "--wst-bg-img: url('" | append: image_url | append: "');"
+    endif
+    echo '--wst-bg-pos: ' | append: settings.background_position | append: ';'
+    echo '--wst-bg-size: ' | append: settings.background_size | append: ';'
+    echo '--wst-bg-repeat: ' | append: settings.background_repeat | append: ';'
+  elsif overlay != blank
+    echo '--wst-bg-img: linear-gradient(' | append: overlay | append: ', ' | append: overlay | append: ');'
+  endif
+
+  # Spacing
+  if settings.padding_top > 0
+    echo '--wst-pt: ' | append: settings.padding_top | append: 'px;'
+  endif
+  if settings.padding_bottom > 0
+    echo '--wst-pb: ' | append: settings.padding_bottom | append: 'px;'
+  endif
+  if settings.margin_top > 0
+    echo '--wst-mt: ' | append: settings.margin_top | append: 'px;'
+  endif
+  if settings.margin_bottom > 0
+    echo '--wst-mb: ' | append: settings.margin_bottom | append: 'px;'
+  endif
+  if settings.custom_mobile_spacing
+    echo '--wst-pt-m: ' | append: settings.padding_top_mobile | append: 'px;'
+    echo '--wst-pb-m: ' | append: settings.padding_bottom_mobile | append: 'px;'
+  endif
+
+  # Border
+  if settings.border_style != blank and settings.border_style != 'none'
+    echo '--wst-border: ' | append: settings.border_width | append: 'px ' | append: settings.border_style | append: ' ' | append: settings.border_color | append: ';'
+  endif
+  if settings.border_radius > 0
+    echo '--wst-radius: ' | append: settings.border_radius | append: 'px;'
+  endif
+
+  # Animation
+  if settings.animation_delay > 0
+    echo '--wst-anim-delay: ' | append: settings.animation_delay | append: 'ms;'
+  endif
+-%}
