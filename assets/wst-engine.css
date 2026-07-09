@@ -26,16 +26,23 @@
    -------------------------------------------------------------------------- */
 .wst-widget {
   --wst-bg: initial;
+  --wst-bg-gradient: initial;
   --wst-bg-img: initial;
   --wst-bg-pos: initial;
   --wst-bg-size: initial;
   --wst-bg-repeat: initial;
   --wst-pt: initial;
   --wst-pb: initial;
+  --wst-pl: initial;
+  --wst-pr: initial;
   --wst-pt-m: initial;
   --wst-pb-m: initial;
+  --wst-pl-m: initial;
+  --wst-pr-m: initial;
   --wst-mt: initial;
   --wst-mb: initial;
+  --wst-ml: initial;
+  --wst-mr: initial;
   --wst-border: initial;
   --wst-radius: initial;
   --wst-min-h: initial;
@@ -57,20 +64,88 @@
   --wst-text-lh: initial;
   --wst-text-cols: initial;
   --wst-text-col-gap: initial;
+  --wst-overflow: initial;
 
   background-color: var(--wst-bg, transparent);
-  background-image: var(--wst-bg-img, none);
+  /* background-image: var(--wst-bg-img, none); */
+  background-image: var(--wst-bg-img, none), var(--wst-bg-gradient, none);
   background-position: var(--wst-bg-pos, center);
   background-size: var(--wst-bg-size, cover);
   background-repeat: var(--wst-bg-repeat, no-repeat);
   padding-top: var(--wst-pt, 0);
   padding-bottom: var(--wst-pb, 0);
+  padding-left: var(--wst-pl, 0);
+  padding-right: var(--wst-pr, 0);
   margin-top: var(--wst-mt, 0);
   margin-bottom: var(--wst-mb, 0);
+  margin-right: var(--wst-ml, 0);
+  margin-left: var(--wst-mr, 0);
   border: var(--wst-border, none);
   border-radius: var(--wst-radius, 0);
   min-height: var(--wst-min-h, auto);
+  overflow: var(--wst-overflow, auto);
 }
+/* 
+.shopify-block {
+    --wst-bg: initial;
+    --wst-bg-gradient: initial;
+    --wst-bg-img: initial;
+    --wst-bg-pos: initial;
+    --wst-bg-size: initial;
+    --wst-bg-repeat: initial;
+    --wst-pt: initial;
+    --wst-pb: initial;
+    --wst-pl: initial;
+    --wst-pr: initial;
+    --wst-pt-m: initial;
+    --wst-pb-m: initial;
+    --wst-pl-m: initial;
+    --wst-pr-m: initial;
+    --wst-mt: initial;
+    --wst-mb: initial;
+    --wst-ml: initial;
+    --wst-mr: initial;
+    --wst-border: initial;
+    --wst-radius: initial;
+    --wst-min-h: initial;
+    --wst-anim-delay: initial;
+    --wst-anim-duration: initial;
+    --wst-direction: initial;
+    --wst-justify: initial;
+    --wst-align-items: initial;
+    --wst-flex-wrap: initial;
+    --wst-gap-row: initial;
+    --wst-gap-col: initial;
+    --wst-cols: initial;
+    --wst-cols-m: initial;
+    --wst-col-w: initial;
+    --wst-content-width: initial;
+    --wst-align: initial;
+    --wst-color: initial;
+    --wst-text-size: initial;
+    --wst-text-lh: initial;
+    --wst-text-cols: initial;
+    --wst-text-col-gap: initial;
+    --wst-overflow: initial;
+    background-color: var(--wst-bg, transparent);
+    background-image: var(--wst-bg-img, none),var(--wst-bg-gradient, none);
+    background-position: var(--wst-bg-pos, center);
+    background-size: var(--wst-bg-size, cover);
+    background-repeat: var(--wst-bg-repeat, no-repeat);
+    padding-top: var(--wst-pt, 0);
+    padding-bottom: var(--wst-pb, 0);
+    padding-left: var(--wst-pl, 0);
+    padding-right: var(--wst-pr, 0);
+    margin-top: var(--wst-mt, 0);
+    margin-bottom: var(--wst-mb, 0);
+    margin-right: var(--wst-ml, 0);
+    margin-left: var(--wst-mr, 0);
+    border: var(--wst-border, none);
+    border-radius: var(--wst-radius, 0);
+    min-height: var(--wst-min-h, auto);
+    overflow: var(--wst-overflow, auto);
+    width: var(--wst-col-w, 100%);
+} */
 
 /* --------------------------------------------------------------------------
    Responsive spacing and device visibility
@@ -79,6 +154,8 @@
   .wst-widget {
     padding-top: var(--wst-pt-m, var(--wst-pt, 0));
     padding-bottom: var(--wst-pb-m, var(--wst-pb, 0));
+    padding-left: var(--wst-pl-m, var(--wst-pl, 0));
+    padding-right: var(--wst-pr-m, var(--wst-pr, 0));
   }
 
   .wst-hide-mobile {

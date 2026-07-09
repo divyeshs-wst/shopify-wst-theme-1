@@ -57,7 +57,7 @@
     "name": "t:general.colors",
     "settings": [
       {
-        "type": "color",
+        "type": "color_background",
         "id": "background_color",
         "default": "#FFFFFF",
         "label": "t:labels.background"

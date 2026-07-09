@@ -16,8 +16,17 @@
 
 {%- liquid
   # Background color
-  if settings.background_color != blank and settings.background_color.alpha != 0.0
-    echo '--wst-bg: ' | append: settings.background_color | append: ';'
+  # if settings.background_color != blank and settings.background_color.alpha != 0.0
+  #   echo '--wst-bg: ' | append: settings.background_color | append: ';'
+  # endif
+
+  # Background color (solid color or gradient, from a color_background setting)
+  if settings.background_color != blank
+    if settings.background_color contains 'gradient'
+      echo '--wst-bg-gradient: ' | append: settings.background_color | append: ';'
+    else
+      echo '--wst-bg: ' | append: settings.background_color | append: ';'
+    endif
   endif
 
   # Background overlay color, combined with its opacity setting
@@ -50,15 +59,29 @@
   if settings.padding_bottom > 0
     echo '--wst-pb: ' | append: settings.padding_bottom | append: 'px;'
   endif
+  if settings.padding_left > 0
+    echo '--wst-pl: ' | append: settings.padding_left | append: 'px;'
+  endif
+  if settings.padding_right > 0
+    echo '--wst-pr: ' | append: settings.padding_right | append: 'px;'
+  endif
   if settings.margin_top > 0
     echo '--wst-mt: ' | append: settings.margin_top | append: 'px;'
   endif
   if settings.margin_bottom > 0
     echo '--wst-mb: ' | append: settings.margin_bottom | append: 'px;'
   endif
+  if settings.margin_left > 0
+    echo '--wst-ml: ' | append: settings.margin_left | append: 'px;'
+  endif
+  if settings.margin_right > 0
+    echo '--wst-mr: ' | append: settings.margin_right | append: 'px;'
+  endif
   if settings.custom_mobile_spacing
     echo '--wst-pt-m: ' | append: settings.padding_top_mobile | append: 'px;'
     echo '--wst-pb-m: ' | append: settings.padding_bottom_mobile | append: 'px;'
+    echo '--wst-pl-m: ' | append: settings.padding_left_mobile | append: 'px;'
+    echo '--wst-pr-m: ' | append: settings.padding_right_mobile | append: 'px;'
   endif
 
   # Border

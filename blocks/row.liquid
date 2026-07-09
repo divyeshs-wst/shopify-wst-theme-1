@@ -106,6 +106,7 @@
 {% schema %}
 {
   "name": "Row",
+  "tag": null,
   "blocks": [
     {
       "type": "@theme"
@@ -357,9 +358,10 @@
       "content": "Style"
     },
     {
-      "type": "color",
+      "type": "color_background",
       "id": "background_color",
-      "label": "Background color"
+      "label": "Background color",
+      "default": "linear-gradient(90deg, #ffffff 0%, #ffffff 100%)"
     },
     {
       "type": "image_picker",
@@ -487,6 +489,26 @@
     },
     {
       "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
       "id": "margin_top",
       "label": "Margin top",
       "min": 0,
@@ -499,6 +521,26 @@
       "type": "range",
       "id": "margin_bottom",
       "label": "Margin bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_left",
+      "label": "Margin left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_right",
+      "label": "Margin right",
       "min": 0,
       "max": 120,
       "step": 4,

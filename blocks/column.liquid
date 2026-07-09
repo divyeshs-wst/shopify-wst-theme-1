@@ -42,7 +42,7 @@
     column-gap: var(--wst-gap-col, 0);
     min-width: 0;
     flex: 1 1 0;
-    height: 100%;
+    /* height: 100%; */
   }
 
   .wst-column--fixed {
@@ -53,6 +53,7 @@
 {% schema %}
 {
   "name": "Column",
+  "tag": null,
   "blocks": [
     {
       "type": "@theme"
@@ -141,9 +142,10 @@
       "content": "Style"
     },
     {
-      "type": "color",
+      "type": "color_background",
       "id": "background_color",
-      "label": "Background color"
+      "label": "Background color",
+      "default": "linear-gradient(90deg, #ffffff 0%, #ffffff 100%)"
     },
     {
       "type": "image_picker",
@@ -271,6 +273,26 @@
     },
     {
       "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
       "id": "margin_top",
       "label": "Margin top",
       "min": 0,
@@ -283,6 +305,26 @@
       "type": "range",
       "id": "margin_bottom",
       "label": "Margin bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_left",
+      "label": "Margin left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_right",
+      "label": "Margin right",
       "min": 0,
       "max": 120,
       "step": 4,
@@ -310,6 +352,28 @@
       "type": "range",
       "id": "padding_bottom_mobile",
       "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.custom_mobile_spacing }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_left_mobile",
+      "label": "Padding left (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.custom_mobile_spacing }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_right_mobile",
+      "label": "Padding right (mobile)",
       "min": 0,
       "max": 120,
       "step": 4,
