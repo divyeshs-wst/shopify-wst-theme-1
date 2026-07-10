@@ -464,7 +464,7 @@
                     "link": "shopify://pages/contact",
                     "open_in_new_tab": true,
                     "button_style": "filled",
-                    "size": "large",
+                    "size": "small",
                     "alignment": "center",
                     "full_width": false,
                     "icon": "none",
