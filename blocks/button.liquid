@@ -49,7 +49,7 @@
   endcapture
 -%}
 
-<div {% render widget: 'button-wrap', extra_vars: button_vars %}>
+<div {% render block: block, widget: 'button-wrap', extra_vars: button_vars %}>
   {%- if settings.link != blank -%}
     <a href="{{ settings.link }}"{{ target_attr }} class="{{ button_classes }}">
       {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
