@@ -491,7 +491,7 @@
                     "padding_bottom_mobile": 0,
                     "border_style": "solid",
                     "border_width": 1,
-                    "border_color": "#121212",
+                    "border_color": "#F2F2F2",
                     "border_radius": 6,
                     "animation": "none",
                     "animation_duration": "normal",
