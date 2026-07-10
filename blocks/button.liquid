@@ -284,22 +284,6 @@
       "default": false
     },
     {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text color"
-    },
-    {
-      "type": "color",
-      "id": "hover_background_color",
-      "label": "Hover background color",
-      "info": "Solid color only. Leave blank to keep the base background on hover."
-    },
-    {
-      "type": "color",
-      "id": "hover_text_color",
-      "label": "Hover text color"
-    },
-    {
       "type": "select",
       "id": "icon",
       "label": "Icon",
@@ -343,6 +327,22 @@
     {
       "type": "header",
       "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "hover_background_color",
+      "label": "Hover background color",
+      "info": "Solid color only. Leave blank to keep the base background on hover."
+    },
+    {
+      "type": "color",
+      "id": "hover_text_color",
+      "label": "Hover text color"
     },
     {
       "type": "color_background",
@@ -455,6 +455,10 @@
       "default": 0
     },
     {
+      "type": "header",
+      "content": "Padding Style"
+    },
+    {
       "type": "range",
       "id": "padding_top",
       "label": "Padding top",
@@ -493,6 +497,10 @@
       "step": 4,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Margin Style"
     },
     {
       "type": "range",
@@ -561,6 +569,10 @@
       "unit": "px",
       "default": 0,
       "visible_if": "{{ block.settings.custom_mobile_spacing }}"
+    },
+    {
+      "type": "header",
+      "content": "Border Style"
     },
     {
       "type": "select",
