@@ -463,7 +463,7 @@
                     "button_text": "Shop now",
                     "link": "shopify://pages/contact",
                     "open_in_new_tab": true,
-                    "button_style": "filled",
+                    "button_style": "text",
                     "size": "large",
                     "alignment": "right",
                     "full_width": false,
