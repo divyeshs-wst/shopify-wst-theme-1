@@ -1,0 +1,731 @@
+{% doc %}
+  Widget: Button
+
+  A link styled as a button, with filled / outline / text-link
+  variants, three sizes, optional icon, and its own hover colors.
+  The outer element only handles alignment; all visual styling
+  (background, border, spacing) lives on the inner <a> so the
+  shared background_color setting supports solid colors and
+  gradients via color_background, same as every other widget.
+  Shared style, animation and advanced settings come from
+  'wst-attributes'.
+{% enddoc %}
+
+{%- liquid
+  assign settings = block.settings
+
+  assign target_attr = ''
+  if settings.open_in_new_tab
+    assign target_attr = ' target="_blank" rel="noopener"'
+  endif
+
+  assign variant_class = 'wst-button--' | append: settings.button_style
+  assign size_class = 'wst-button--' | append: settings.size
+  assign full_class = ''
+  if settings.full_width
+    assign full_class = ' wst-button--full'
+  endif
+  assign button_classes = 'wst-button ' | append: variant_class | append: ' ' | append: size_class | append: full_class
+
+  # Widget specific style variables, passed to wst-attributes
+  capture button_vars
+    if settings.text_color != blank and settings.text_color.alpha != 0.0
+      echo '--wst-color: ' | append: settings.text_color | append: ';'
+    endif
+    if settings.hover_background_color != blank and settings.hover_background_color.alpha != 0.0
+      echo '--wst-bg-hover: ' | append: settings.hover_background_color | append: ';'
+    endif
+    if settings.hover_text_color != blank and settings.hover_text_color.alpha != 0.0
+      echo '--wst-color-hover: ' | append: settings.hover_text_color | append: ';'
+    endif
+    case settings.alignment
+      when 'center'
+        echo '--wst-justify-btn: center;'
+      when 'right'
+        echo '--wst-justify-btn: flex-end;'
+      else
+        echo '--wst-justify-btn: flex-start;'
+    endcase
+  endcapture
+-%}
+
+<div {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}>
+  {%- if settings.link != blank -%}
+    <a href="{{ settings.link }}"{{ target_attr }} class="{{ button_classes }}">
+      {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+      <span class="wst-button__label">{{ settings.button_text | escape }}</span>
+      {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+    </a>
+  {%- else -%}
+    <span class="{{ button_classes }}" aria-disabled="true">
+      {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+      <span class="wst-button__label">{{ settings.button_text | escape }}</span>
+      {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+    </span>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .wst-button-wrap {
+    display: flex;
+    justify-content: var(--wst-justify-btn, flex-start);
+  }
+
+  .wst-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    background-color: var(--wst-bg, #121212);
+    background-image: var(--wst-bg-img, none), var(--wst-bg-gradient, none);
+    background-position: var(--wst-bg-pos, center);
+    background-size: var(--wst-bg-size, cover);
+    background-repeat: var(--wst-bg-repeat, no-repeat);
+    color: var(--wst-color, #ffffff);
+    border: var(--wst-border, none);
+    border-radius: var(--wst-radius, 6px);
+    padding-top: var(--wst-pt, 12px);
+    padding-bottom: var(--wst-pb, 12px);
+    padding-left: var(--wst-pl, 28px);
+    padding-right: var(--wst-pr, 28px);
+  }
+
+  .wst-button:hover,
+  .wst-button:focus-visible {
+    background-color: var(--wst-bg-hover, var(--wst-bg, #121212));
+    background-image: var(--wst-bg-hover, none);
+    color: var(--wst-color-hover, var(--wst-color, #ffffff));
+    transform: translateY(-1px);
+  }
+
+  .wst-button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* Size variants */
+  .wst-button--small {
+    font-size: 13px;
+    padding-top: var(--wst-pt, 8px);
+    padding-bottom: var(--wst-pb, 8px);
+    padding-left: var(--wst-pl, 18px);
+    padding-right: var(--wst-pr, 18px);
+  }
+
+  .wst-button--medium {
+    font-size: 15px;
+  }
+
+  .wst-button--large {
+    font-size: 17px;
+    padding-top: var(--wst-pt, 16px);
+    padding-bottom: var(--wst-pb, 16px);
+    padding-left: var(--wst-pl, 36px);
+    padding-right: var(--wst-pr, 36px);
+  }
+
+  /* Style variants: written after .wst-button so they win on equal specificity */
+  .wst-button--outline {
+    background-color: transparent;
+    background-image: none;
+    color: var(--wst-color, #121212);
+    border: var(--wst-border, 2px solid var(--wst-color, #121212));
+  }
+
+  .wst-button--outline:hover,
+  .wst-button--outline:focus-visible {
+    background-color: var(--wst-bg-hover, var(--wst-color, #121212));
+    background-image: none;
+    color: var(--wst-color-hover, var(--wst-bg, #ffffff));
+    border-color: var(--wst-bg-hover, var(--wst-color, #121212));
+  }
+
+  .wst-button--text {
+    background-color: transparent;
+    background-image: none;
+    color: var(--wst-color, #121212);
+    border: none;
+    border-radius: 0;
+    padding-left: 0;
+    padding-right: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .wst-button--text:hover,
+  .wst-button--text:focus-visible {
+    background: none;
+    transform: none;
+    color: var(--wst-color-hover, var(--wst-bg, #121212));
+    text-decoration-thickness: 2px;
+  }
+
+  .wst-button--full {
+    width: 100%;
+  }
+
+  .wst-button[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .wst-button__label {
+    display: inline-block;
+  }
+
+  .wst-button__icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "filled",
+          "label": "Filled"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        },
+        {
+          "value": "text",
+          "label": "Text link"
+        }
+      ],
+      "default": "filled"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "hover_background_color",
+      "label": "Hover background color",
+      "info": "Solid color only. Leave blank to keep the base background on hover."
+    },
+    {
+      "type": "color",
+      "id": "hover_text_color",
+      "label": "Hover text color"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "Icon",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "arrow-right",
+          "label": "Arrow right"
+        },
+        {
+          "value": "arrow-left",
+          "label": "Arrow left"
+        },
+        {
+          "value": "external",
+          "label": "External link"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "icon_position",
+      "label": "Icon position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "right",
+      "visible_if": "{{ block.settings.icon != 'none' }}"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color_background",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "linear-gradient(90deg, #121212 0%, #121212 100%)"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "select",
+      "id": "background_position",
+      "label": "Background image position",
+      "options": [
+        {
+          "value": "top left",
+          "label": "Top left"
+        },
+        {
+          "value": "top center",
+          "label": "Top center"
+        },
+        {
+          "value": "top right",
+          "label": "Top right"
+        },
+        {
+          "value": "center left",
+          "label": "Center left"
+        },
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center right",
+          "label": "Center right"
+        },
+        {
+          "value": "bottom left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "bottom right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "center center",
+      "visible_if": "{{ block.settings.background_image != blank }}"
+    },
+    {
+      "type": "select",
+      "id": "background_size",
+      "label": "Background image size",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover"
+        },
+        {
+          "value": "contain",
+          "label": "Contain"
+        },
+        {
+          "value": "auto",
+          "label": "Original"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ block.settings.background_image != blank }}"
+    },
+    {
+      "type": "select",
+      "id": "background_repeat",
+      "label": "Background image repeat",
+      "options": [
+        {
+          "value": "no-repeat",
+          "label": "No repeat"
+        },
+        {
+          "value": "repeat",
+          "label": "Repeat"
+        }
+      ],
+      "default": "no-repeat",
+      "visible_if": "{{ block.settings.background_image != blank }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Background overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_left",
+      "label": "Margin left",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_right",
+      "label": "Margin right",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_mobile_spacing",
+      "label": "Use custom mobile spacing",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.custom_mobile_spacing }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom (mobile)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.custom_mobile_spacing }}"
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "Border",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "solid",
+          "label": "Solid"
+        },
+        {
+          "value": "dashed",
+          "label": "Dashed"
+        },
+        {
+          "value": "dotted",
+          "label": "Dotted"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border thickness",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 1,
+      "visible_if": "{{ block.settings.border_style != 'none' }}"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#121212",
+      "visible_if": "{{ block.settings.border_style != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Entrance animation",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fade",
+          "label": "Fade in"
+        },
+        {
+          "value": "fade-up",
+          "label": "Fade up"
+        },
+        {
+          "value": "fade-down",
+          "label": "Fade down"
+        },
+        {
+          "value": "fade-left",
+          "label": "Fade left"
+        },
+        {
+          "value": "fade-right",
+          "label": "Fade right"
+        },
+        {
+          "value": "zoom-in",
+          "label": "Zoom in"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "animation_duration",
+      "label": "Animation speed",
+      "options": [
+        {
+          "value": "fast",
+          "label": "Fast"
+        },
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "slow",
+          "label": "Slow"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.animation != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "animation_delay",
+      "label": "Animation delay",
+      "min": 0,
+      "max": 1000,
+      "step": 100,
+      "unit": "ms",
+      "default": 0,
+      "visible_if": "{{ block.settings.animation != 'none' }}"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_tablet",
+      "label": "Hide on tablet",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "custom_class",
+      "label": "Custom CSS class",
+      "info": "Add your own class names, separated by spaces."
+    },
+    {
+      "type": "text",
+      "id": "custom_id",
+      "label": "Custom ID",
+      "info": "Optional anchor, for example to link to this element from a menu."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Button"
+    }
+  ]
+}
+{% endschema %}
