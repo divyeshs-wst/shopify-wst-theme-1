@@ -49,7 +49,7 @@
   endcapture
 -%}
 
-<div>
+<div {% render 'wst-attributes', block: block, widget: 'button-wrap' %}>
   {%- if settings.link != blank -%}
     <a href="{{ settings.link }}"{{ target_attr }} class="{{ button_classes }}">
       {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
