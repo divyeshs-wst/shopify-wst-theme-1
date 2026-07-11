@@ -514,7 +514,7 @@
                         "link": "",
                         "open_in_new_tab": false,
                         "button_style": "filled",
-                        "size": "small",
+                        "size": "medium",
                         "alignment": "center",
                         "full_width": false,
                         "icon": "none",
