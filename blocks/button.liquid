@@ -3,12 +3,19 @@
 
   A link styled as a button, with filled / outline / text-link
   variants, three sizes, optional icon, and its own hover colors.
-  The outer element only handles alignment; all visual styling
-  (background, border, spacing) lives on the inner <a> so the
-  shared background_color setting supports solid colors and
-  gradients via color_background, same as every other widget.
-  Shared style, animation and advanced settings come from
-  'wst-attributes'.
+
+  There is no wrapper element. wst-attributes is rendered directly
+  on the visible <a> (or <span> when there's no link), so it is the
+  single root element for this block (required since "tag": null).
+  That single element carries two class sources that both have to
+  survive together:
+    - the classes wst-attributes builds itself (wst-widget, wst-,
+      hide-on-x, any custom_class the merchant typed in)
+    - this widget's own classes (wst-button, the variant/size/
+      alignment/full-width modifiers)
+  wst-attributes' extra_class parameter is exactly for this: pass
+  our own classes in and it appends them to its own list rather
+  than overwriting it.
 {% enddoc %}
 
 {%- liquid
@@ -21,11 +28,12 @@
 
   assign variant_class = 'wst-button--' | append: settings.button_style
   assign size_class = 'wst-button--' | append: settings.size
+  assign align_class = 'wst-button--align-' | append: settings.alignment
   assign full_class = ''
   if settings.full_width
     assign full_class = ' wst-button--full'
   endif
-  assign button_classes = 'wst-button ' | append: variant_class | append: ' ' | append: size_class | append: full_class
+  assign button_classes = 'wst-button ' | append: variant_class | append: ' ' | append: size_class | append: ' ' | append: align_class | append: full_class
 
   # Widget specific style variables, passed to wst-attributes
   capture button_vars
@@ -38,47 +46,32 @@
     if settings.hover_text_color != blank and settings.hover_text_color.alpha != 0.0
       echo '--wst-color-hover: ' | append: settings.hover_text_color | append: ';'
     endif
-    case settings.alignment
-      when 'center'
-        echo '--wst-justify-btn: center;'
-      when 'right'
-        echo '--wst-justify-btn: flex-end;'
-      else
-        echo '--wst-justify-btn: flex-start;'
-    endcase
   endcapture
 -%}
 
-<div {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}>
-  {%- if settings.link != blank -%}
-    <a href="{{ settings.link }}"{{ target_attr }} class="{{ button_classes }}">
-      {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
-        {%- render 'wst-button-icon', icon: settings.icon -%}
-      {%- endif -%}
-      <span class="wst-button__label">{{ settings.button_text | escape }}</span>
-      {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
-        {%- render 'wst-button-icon', icon: settings.icon -%}
-      {%- endif -%}
-    </a>
-  {%- else -%}
-    <span class="{{ button_classes }}" aria-disabled="true">
-      {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
-        {%- render 'wst-button-icon', icon: settings.icon -%}
-      {%- endif -%}
-      <span class="wst-button__label">{{ settings.button_text | escape }}</span>
-      {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
-        {%- render 'wst-button-icon', icon: settings.icon -%}
-      {%- endif -%}
-    </span>
-  {%- endif -%}
-</div>
+{%- if settings.link != blank -%}
+  <a href="{{ settings.link }}"{{ target_attr }} {% render 'wst-attributes', block: block, widget: 'button', extra_class: button_classes, extra_vars: button_vars %}>
+    {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
+      {%- render 'wst-button-icon', icon: settings.icon -%}
+    {%- endif -%}
+    <span class="wst-button__label">{{ settings.button_text | escape }}</span>
+    {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
+      {%- render 'wst-button-icon', icon: settings.icon -%}
+    {%- endif -%}
+  </a>
+{%- else -%}
+  <span {% render 'wst-attributes', block: block, widget: 'button', extra_class: button_classes, extra_vars: button_vars %} aria-disabled="true">
+    {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
+      {%- render 'wst-button-icon', icon: settings.icon -%}
+    {%- endif -%}
+    <span class="wst-button__label">{{ settings.button_text | escape }}</span>
+    {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
+      {%- render 'wst-button-icon', icon: settings.icon -%}
+    {%- endif -%}
+  </span>
+{%- endif -%}
 
 {% stylesheet %}
-  .wst-button-wrap {
-    display: flex;
-    justify-content: var(--wst-justify-btn, flex-start);
-  }
-
   .wst-button {
     display: inline-flex;
     align-items: center;
@@ -107,14 +100,48 @@
 
   .wst-button:hover,
   .wst-button:focus-visible {
+    /* Only the flat background color changes on hover. A background
+       image/gradient (if set via the shared Background settings) is
+       a separate layer and intentionally stays as-is here - putting
+       a plain color into background-image is invalid CSS and was
+       silently doing nothing before this fix. */
     background-color: var(--wst-bg-hover, var(--wst-bg, #121212));
-    background-image: var(--wst-bg-hover, none);
     color: var(--wst-color-hover, var(--wst-color, #ffffff));
   }
 
   .wst-button:focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 2px;
+  }
+
+  /* wst-engine.css maps --wst-ml to margin-right and --wst-mr to
+     margin-left (swapped). That file is left as-is on purpose, so
+     this corrects it just for Button. Both "wst-widget" and
+     "wst-button" are on the same element here, so the combined
+     selector has higher specificity than the engine's single-class
+     .wst-widget rule and wins no matter which stylesheet loads
+     first. */
+  .wst-widget.wst-button {
+    margin-left: var(--wst-ml, 0);
+    margin-right: var(--wst-mr, 0);
+  }
+
+  /* Alignment: since there's no wrapper anymore, this button is a
+     direct flex child of whatever Row or Column contains it. Auto
+     margins are the standard way to position a single flex item
+     (flexbox has no per-child justify-self). This intentionally
+     overrides a manual Margin left/right value while active. */
+  .wst-button.wst-button--align-left {
+    margin-right: auto;
+  }
+
+  .wst-button.wst-button--align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .wst-button.wst-button--align-right {
+    margin-left: auto;
   }
 
   /* Size variants */
@@ -222,18 +249,9 @@
       "id": "button_style",
       "label": "Button style",
       "options": [
-        {
-          "value": "filled",
-          "label": "Filled"
-        },
-        {
-          "value": "outline",
-          "label": "Outline"
-        },
-        {
-          "value": "text",
-          "label": "Text link"
-        }
+        { "value": "filled", "label": "Filled" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "text", "label": "Text link" }
       ],
       "default": "filled"
     },
@@ -242,18 +260,9 @@
       "id": "size",
       "label": "Size",
       "options": [
-        {
-          "value": "small",
-          "label": "Small"
-        },
-        {
-          "value": "medium",
-          "label": "Medium"
-        },
-        {
-          "value": "large",
-          "label": "Large"
-        }
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
       ],
       "default": "medium"
     },
@@ -262,18 +271,9 @@
       "id": "alignment",
       "label": "Alignment",
       "options": [
-        {
-          "value": "left",
-          "label": "Left"
-        },
-        {
-          "value": "center",
-          "label": "Center"
-        },
-        {
-          "value": "right",
-          "label": "Right"
-        }
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
       ],
       "default": "left"
     },
@@ -288,22 +288,10 @@
       "id": "icon",
       "label": "Icon",
       "options": [
-        {
-          "value": "none",
-          "label": "None"
-        },
-        {
-          "value": "arrow-right",
-          "label": "Arrow right"
-        },
-        {
-          "value": "arrow-left",
-          "label": "Arrow left"
-        },
-        {
-          "value": "external",
-          "label": "External link"
-        }
+        { "value": "none", "label": "None" },
+        { "value": "arrow-right", "label": "Arrow right" },
+        { "value": "arrow-left", "label": "Arrow left" },
+        { "value": "external", "label": "External link" }
       ],
       "default": "none"
     },
@@ -312,14 +300,8 @@
       "id": "icon_position",
       "label": "Icon position",
       "options": [
-        {
-          "value": "left",
-          "label": "Left"
-        },
-        {
-          "value": "right",
-          "label": "Right"
-        }
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
       ],
       "default": "right",
       "visible_if": "{{ block.settings.icon != 'none' }}"
@@ -360,42 +342,15 @@
       "id": "background_position",
       "label": "Background image position",
       "options": [
-        {
-          "value": "top left",
-          "label": "Top left"
-        },
-        {
-          "value": "top center",
-          "label": "Top center"
-        },
-        {
-          "value": "top right",
-          "label": "Top right"
-        },
-        {
-          "value": "center left",
-          "label": "Center left"
-        },
-        {
-          "value": "center center",
-          "label": "Center"
-        },
-        {
-          "value": "center right",
-          "label": "Center right"
-        },
-        {
-          "value": "bottom left",
-          "label": "Bottom left"
-        },
-        {
-          "value": "bottom center",
-          "label": "Bottom center"
-        },
-        {
-          "value": "bottom right",
-          "label": "Bottom right"
-        }
+        { "value": "top left", "label": "Top left" },
+        { "value": "top center", "label": "Top center" },
+        { "value": "top right", "label": "Top right" },
+        { "value": "center left", "label": "Center left" },
+        { "value": "center center", "label": "Center" },
+        { "value": "center right", "label": "Center right" },
+        { "value": "bottom left", "label": "Bottom left" },
+        { "value": "bottom center", "label": "Bottom center" },
+        { "value": "bottom right", "label": "Bottom right" }
       ],
       "default": "center center",
       "visible_if": "{{ block.settings.background_image != blank }}"
@@ -405,18 +360,9 @@
       "id": "background_size",
       "label": "Background image size",
       "options": [
-        {
-          "value": "cover",
-          "label": "Cover"
-        },
-        {
-          "value": "contain",
-          "label": "Contain"
-        },
-        {
-          "value": "auto",
-          "label": "Original"
-        }
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "auto", "label": "Original" }
       ],
       "default": "cover",
       "visible_if": "{{ block.settings.background_image != blank }}"
@@ -426,14 +372,8 @@
       "id": "background_repeat",
       "label": "Background image repeat",
       "options": [
-        {
-          "value": "no-repeat",
-          "label": "No repeat"
-        },
-        {
-          "value": "repeat",
-          "label": "Repeat"
-        }
+        { "value": "no-repeat", "label": "No repeat" },
+        { "value": "repeat", "label": "Repeat" }
       ],
       "default": "no-repeat",
       "visible_if": "{{ block.settings.background_image != blank }}"
@@ -579,22 +519,10 @@
       "id": "border_style",
       "label": "Border",
       "options": [
-        {
-          "value": "none",
-          "label": "None"
-        },
-        {
-          "value": "solid",
-          "label": "Solid"
-        },
-        {
-          "value": "dashed",
-          "label": "Dashed"
-        },
-        {
-          "value": "dotted",
-          "label": "Dotted"
-        }
+        { "value": "none", "label": "None" },
+        { "value": "solid", "label": "Solid" },
+        { "value": "dashed", "label": "Dashed" },
+        { "value": "dotted", "label": "Dotted" }
       ],
       "default": "none"
     },
@@ -635,34 +563,13 @@
       "id": "animation",
       "label": "Entrance animation",
       "options": [
-        {
-          "value": "none",
-          "label": "None"
-        },
-        {
-          "value": "fade",
-          "label": "Fade in"
-        },
-        {
-          "value": "fade-up",
-          "label": "Fade up"
-        },
-        {
-          "value": "fade-down",
-          "label": "Fade down"
-        },
-        {
-          "value": "fade-left",
-          "label": "Fade left"
-        },
-        {
-          "value": "fade-right",
-          "label": "Fade right"
-        },
-        {
-          "value": "zoom-in",
-          "label": "Zoom in"
-        }
+        { "value": "none", "label": "None" },
+        { "value": "fade", "label": "Fade in" },
+        { "value": "fade-up", "label": "Fade up" },
+        { "value": "fade-down", "label": "Fade down" },
+        { "value": "fade-left", "label": "Fade left" },
+        { "value": "fade-right", "label": "Fade right" },
+        { "value": "zoom-in", "label": "Zoom in" }
       ],
       "default": "none"
     },
@@ -671,18 +578,9 @@
       "id": "animation_duration",
       "label": "Animation speed",
       "options": [
-        {
-          "value": "fast",
-          "label": "Fast"
-        },
-        {
-          "value": "normal",
-          "label": "Normal"
-        },
-        {
-          "value": "slow",
-          "label": "Slow"
-        }
+        { "value": "fast", "label": "Fast" },
+        { "value": "normal", "label": "Normal" },
+        { "value": "slow", "label": "Slow" }
       ],
       "default": "normal",
       "visible_if": "{{ block.settings.animation != 'none' }}"
@@ -734,9 +632,7 @@
     }
   ],
   "presets": [
-    {
-      "name": "Button"
-    }
+    { "name": "Button" }
   ]
 }
 {% endschema %}
