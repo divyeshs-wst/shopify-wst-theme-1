@@ -503,8 +503,8 @@
                       "name": "Button",
                       "settings": {
                         "button_text": "Shop now",
-                        "link": "shopify://pages/contact",
-                        "open_in_new_tab": true,
+                        "link": "",
+                        "open_in_new_tab": false,
                         "button_style": "filled",
                         "size": "small",
                         "alignment": "center",
