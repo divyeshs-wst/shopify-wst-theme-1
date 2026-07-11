@@ -49,13 +49,7 @@
   endcapture
 -%}
 
-{% render 'wst-attributes',
-  block: block,
-  widget: 'button-wrap',
-  extra_vars: button_vars
-%}
-
-{% comment %} <div {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}> {% endcomment %}
+<div {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}>
   {%- if settings.link != blank -%}
     <a href="{{ settings.link }}"{{ target_attr }} class="{{ button_classes }}">
       {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
@@ -77,7 +71,7 @@
       {%- endif -%}
     </span>
   {%- endif -%}
-{% comment %} </div> {% endcomment %}
+</div>
 
 {% stylesheet %}
   .wst-button-wrap {
