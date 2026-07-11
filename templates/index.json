@@ -568,7 +568,7 @@
                         "icon": "none",
                         "icon_position": "right",
                         "text_color": "",
-                        "hover_background_color": "",
+                        "hover_background_color": "#D51010",
                         "hover_text_color": "",
                         "background_color": "linear-gradient(180deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1) 100%)",
                         "background_position": "center center",
