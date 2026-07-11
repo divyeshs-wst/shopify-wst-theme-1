@@ -58,7 +58,7 @@
 
 {% comment %} <div {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}> {% endcomment %}
   {%- if settings.link != blank -%}
-    <a href="{{ settings.link }}"{{ target_attr }} class="{{ widget_class }} {{ settings.custom_class }} {{ additional_classes }}">
+    <a href="{{ settings.link }}"{{ target_attr }} class="{{ settings.custom_class }} {{ additional_classes }}">
       {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
         {%- render 'wst-button-icon', icon: settings.icon -%}
       {%- endif -%}
@@ -68,7 +68,7 @@
       {%- endif -%}
     </a>
   {%- else -%}
-    <span class="{{ widget_class }} {{ settings.custom_class }} {{ additional_classes }}" aria-disabled="true">
+    <span class="{{ settings.custom_class }} {{ additional_classes }}" aria-disabled="true">
       {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
         {%- render 'wst-button-icon', icon: settings.icon -%}
       {%- endif -%}
