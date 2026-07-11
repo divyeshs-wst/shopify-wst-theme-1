@@ -49,12 +49,11 @@
   endcapture
 -%}
 
-{% comment %} {% render 'wst-attributes',
+{% render 'wst-attributes',
   block: block,
   widget: 'button-wrap',
-  extra_vars: button_vars,
-  additional_classes: button_classes
-%} {% endcomment %}
+  extra_vars: button_vars
+%}
 
 {% comment %} <div {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}> {% endcomment %}
   {%- if settings.link != blank -%}
