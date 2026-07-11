@@ -49,41 +49,36 @@
   endcapture
 -%}
 
-{% comment %} <div {{ target_attr }} {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}> {% endcomment %}
-{%- if settings.link != blank -%}
-  <a
-    href="{{ settings.link }}"
-    {{ target_attr }}
-    {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}
-    class="{{ button_classes }}"
-  >
-    {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
-      {%- render 'wst-button-icon', icon: settings.icon -%}
-    {%- endif -%}
+{% render 'wst-attributes',
+  block: block,
+  widget: 'button-wrap',
+  extra_vars: button_vars,
+  additional_classes: button_classes
+%}
 
-    <span class="wst-button__label">{{ settings.button_text | escape }}</span>
-
-    {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
-      {%- render 'wst-button-icon', icon: settings.icon -%}
-    {%- endif -%}
-  </a>
-{%- else -%}
-  <span
-    aria-disabled="true"
-    {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}
-    class="{{ button_classes }}"
-  >
-    {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
-      {%- render 'wst-button-icon', icon: settings.icon -%}
-    {%- endif -%}
-
-    <span class="wst-button__label">{{ settings.button_text | escape }}</span>
-
-    {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
-      {%- render 'wst-button-icon', icon: settings.icon -%}
-    {%- endif -%}
-  </span>
-{%- endif -%}
+{% comment %} <div {% render 'wst-attributes', block: block, widget: 'button-wrap', extra_vars: button_vars %}> {% endcomment %}
+  {%- if settings.link != blank -%}
+    <a href="{{ settings.link }}"{{ target_attr }} class="{{ widget_class }} {{ settings.custom_class }} {{ additional_classes }}">
+      {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+      <span class="wst-button__label">{{ settings.button_text | escape }}</span>
+      {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+    </a>
+  {%- else -%}
+    <span class="{{ widget_class }} {{ settings.custom_class }} {{ additional_classes }}" aria-disabled="true">
+      {%- if settings.icon != 'none' and settings.icon_position == 'left' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+      <span class="wst-button__label">{{ settings.button_text | escape }}</span>
+      {%- if settings.icon != 'none' and settings.icon_position == 'right' -%}
+        {%- render 'wst-button-icon', icon: settings.icon -%}
+      {%- endif -%}
+    </span>
+  {%- endif -%}
+{% comment %} </div> {% endcomment %}
 
 {% stylesheet %}
   .wst-button-wrap {
